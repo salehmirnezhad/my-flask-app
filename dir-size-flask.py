@@ -2,6 +2,7 @@ import os
 import json
 from flask import Flask, jsonify
 
+echo "saleh mirnezhad"
 app = Flask(__name__)
 
 def get_directory_info(path):
