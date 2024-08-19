@@ -2,7 +2,6 @@ import os
 import json
 from flask import Flask, jsonify
 
-echo "saleh mirnezhad"
 app = Flask(__name__)
 
 def get_directory_info(path):
@@ -21,7 +20,7 @@ def get_directory_info(path):
 
 @app.route('/directory_info', methods=['GET'])
 def directory_info():
-    root_path = '/tmp'  # می‌توانید این را به هر دایرکتوری که می‌خواهید تغییر دهید
+    root_path = '/opt'
     info = get_directory_info(root_path)
     return jsonify(info)
 
