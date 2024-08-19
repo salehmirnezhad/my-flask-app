@@ -1,0 +1,16 @@
+{
+  "paths": [
+    {
+      "path": "/mnt/path1",
+      "size": 2357198848,
+      "count": 4,
+      "status": "Exist"
+    },
+    {
+      "path": "/mnt/path2",
+      "size": 4525654016,
+      "count": 4,
+      "status": "Exist"
+    }
+  ]
+}
