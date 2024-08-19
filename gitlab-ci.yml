@@ -1,0 +1,22 @@
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  script:
+    - echo "Building the application..."
+    - docker build -t my-flask-app .
+
+test:
+  stage: test
+  script:
+    - echo "Running tests..."
+    - docker run --rm my-flask-app pytest
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying the application..."
+    - docker-compose up -d
