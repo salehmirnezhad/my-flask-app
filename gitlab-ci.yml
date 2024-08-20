@@ -9,6 +9,7 @@ build:
     - echo "Building the application..."
     - docker build -t my-flask-app .
   timeout: 60m
+  allow_failure: false  # مطمئن می‌شود که اگر این مرحله خطا دهد، مراحل بعدی اجرا نخواهند شد.
 
 test:
   stage: test
@@ -16,6 +17,7 @@ test:
     - echo "Running tests..."
     - docker run --rm my-flask-app pytest
   timeout: 60m
+  allow_failure: false  # مطمئن می‌شود که اگر این مرحله خطا دهد، مراحل بعدی اجرا نخواهند شد.
 
 deploy:
   stage: deploy
@@ -23,3 +25,4 @@ deploy:
     - echo "Deploying the application..."
     - docker-compose up -d
   timeout: 60m
+  allow_failure: false  # مطمئن می‌شود که اگر این مرحله خطا دهد، مراحل بعدی اجرا نخواهند شد.
