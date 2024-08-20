@@ -1,0 +1,43 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  CONTAINER_NAME: my-flask-app
+  IMAGE_NAME: my-flask-app
+  TAG_NAME: $CI_COMMIT_TAG
+  DOCKER_IMAGE: "$IMAGE_NAME:$TAG_NAME"
+
+before_script:
+  - echo "Using Docker image tag: $DOCKER_IMAGE"
+
+build:
+  stage: build
+  script:
+    - echo "Building the application..."
+    - docker build -t $DOCKER_IMAGE .
+  timeout: 60m
+  allow_failure: false
+
+test:
+  stage: test
+  script:
+    - echo "Running tests..."
+    - docker run --rm $DOCKER_IMAGE pytest
+  timeout: 60m
+  allow_failure: false
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying the application..."
+    # Stop and remove old container if exists
+    - docker ps -q -f name=$CONTAINER_NAME | xargs -r docker stop
+    - docker ps -a -q -f name=$CONTAINER_NAME | xargs -r docker rm
+    # Remove old images if needed
+    - docker images -q $IMAGE_NAME | xargs -r docker rmi || true
+    # Run the new container
+    - docker run -d --name $CONTAINER_NAME -p 8081:8081 $DOCKER_IMAGE
+  timeout: 60m
+  allow_failure: false
