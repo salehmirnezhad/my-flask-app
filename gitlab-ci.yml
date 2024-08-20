@@ -7,7 +7,8 @@ build:
   stage: build
   script:
     - echo "Building the application..."
-    - docker build -t my-flask-app .
+    - cd /root/my-flask-app
+    - docker build -t my-flask-app2 .
   timeout: 60m
   allow_failure: false  # مطمئن می‌شود که اگر این مرحله خطا دهد، مراحل بعدی اجرا نخواهند شد.
 
@@ -15,7 +16,7 @@ test:
   stage: test
   script:
     - echo "Running tests..."
-    - docker run --rm my-flask-app pytest
+    - docker run --rm my-flask-app2 pytest
   timeout: 60m
   allow_failure: false  # مطمئن م  ی‌شود که اگر این مرحله خطا دهد، مراحل بعدی اجرا نخواهند شد.
 
