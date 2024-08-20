@@ -17,7 +17,7 @@ test:
     - echo "Running tests..."
     - docker run --rm my-flask-app pytest
   timeout: 60m
-  allow_failure: false  # مطمئن می‌شود که اگر این مرحله خطا دهد، مراحل بعدی اجرا نخواهند شد.
+  allow_failure: false  # مطمئن م  ی‌شود که اگر این مرحله خطا دهد، مراحل بعدی اجرا نخواهند شد.
 
 deploy:
   stage: deploy
