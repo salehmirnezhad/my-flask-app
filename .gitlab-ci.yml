@@ -5,12 +5,12 @@ stages:
 
 variables:
   CONTAINER_NAME: my-flask-app
-  IMAGE_NAME: my-flask-app
+  IMAGE_NAME: salehmirnezhad/my-flask-app
   TAG_NAME: $CI_COMMIT_TAG
   DOCKER_IMAGE: "$IMAGE_NAME:$TAG_NAME"
 
-    #before_script:
-    #  - echo "Using Docker image tag: $DOCKER_IMAGE"
+before_script:
+  - echo "Using Docker image tag: $DOCKER_IMAGE"
 
 build:
   stage: build
