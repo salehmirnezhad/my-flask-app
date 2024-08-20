@@ -4,18 +4,19 @@ stages:
   - deploy
 
 variables:
-  VERSION: "v1.0.${CI_PIPELINE_ID}"
-  CONTAINER_NAME: "flask_app"
-  IMAGE_NAME: "my-flask-app"
+  CONTAINER_NAME: my-flask-app
+  IMAGE_NAME: my-flask-app
+  TAG_NAME: $CI_COMMIT_TAG
+  DOCKER_IMAGE: "$IMAGE_NAME:$TAG_NAME"
+
+before_script:
+  - echo "Using Docker image tag: $DOCKER_IMAGE"
 
 build:
   stage: build
   script:
     - echo "Building the application..."
-    - cd /root/my-flask-app
-    - docker build -t ${IMAGE_NAME}:${VERSION} .
-    # Clean up old images
-    - docker image prune -f
+    - docker build -t $DOCKER_IMAGE .
   timeout: 60m
   allow_failure: false
 
@@ -23,7 +24,7 @@ test:
   stage: test
   script:
     - echo "Running tests..."
-    - docker run --rm ${IMAGE_NAME}:${VERSION} pytest
+    - docker run --rm $DOCKER_IMAGE pytest
   timeout: 60m
   allow_failure: false
 
@@ -31,12 +32,12 @@ deploy:
   stage: deploy
   script:
     - echo "Deploying the application..."
-    # Stop and remove existing container if it exists
-    - docker ps -q -f name=${CONTAINER_NAME} | xargs -r docker stop
-    - docker ps -a -q -f name=${CONTAINER_NAME} | xargs -r docker rm
-    # Remove old images
-    - docker images -q ${IMAGE_NAME} | xargs -r docker rmi
-    # Run new container with updated image
-    - docker run -d --name ${CONTAINER_NAME} -p 8081:8081 ${IMAGE_NAME}:${VERSION}
+    # Stop and remove old container if exists
+    - docker ps -q -f name=$CONTAINER_NAME | xargs -r docker stop
+    - docker ps -a -q -f name=$CONTAINER_NAME | xargs -r docker rm
+    # Remove old images if needed
+    - docker images -q $IMAGE_NAME | xargs -r docker rmi || true
+    # Run the new container
+    - docker run -d --name $CONTAINER_NAME -p 8081:8081 $DOCKER_IMAGE
   timeout: 60m
   allow_failure: false
