@@ -3,27 +3,35 @@ stages:
   - test
   - deploy
 
+variables:
+  VERSION: "v1.0.${CI_PIPELINE_ID}"
+  CONTAINER_NAME: "flask_app"
+
 build:
   stage: build
   script:
     - echo "Building the application..."
     - cd /root/my-flask-app
-    - docker build -t my-flask-app2 .
+    - docker build -t my-flask-app:${VERSION} .
   timeout: 60m
-  allow_failure: false  # مطمئن می‌شود که اگر این مرحله خطا دهد، مراحل بعدی اجرا نخواهند شد.
+  allow_failure: false
 
 test:
   stage: test
   script:
     - echo "Running tests..."
-    - docker run --rm my-flask-app2 pytest
+    - docker run --rm my-flask-app:${VERSION} pytest
   timeout: 60m
-  allow_failure: false  # مطمئن م  ی‌شود که اگر این مرحله خطا دهد، مراحل بعدی اجرا نخواهند شد.
+  allow_failure: false
 
 deploy:
   stage: deploy
   script:
     - echo "Deploying the application..."
-    - docker-compose up -d
+    # Stop and remove existing container if it exists
+    - docker ps -q -f name=${CONTAINER_NAME} | xargs -r docker stop
+    - docker ps -a -q -f name=${CONTAINER_NAME} | xargs -r docker rm
+    # Run new container with updated image
+    - docker run -d --name ${CONTAINER_NAME} -p 8081:8081 my-flask-app:${VERSION}
   timeout: 60m
-  allow_failure: false  # مطمئن می‌شود که اگر این مرحله خطا دهد، مراحل بعدی اجرا نخواهند شد.
+  allow_failure: false

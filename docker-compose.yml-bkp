@@ -2,8 +2,8 @@ version: '3.8'
 
 services:
   web:
-    image: my-flask-app:${VERSION:-latest}
-    container_name: flask_app_${VERSION:-latest}
+    build: .
+    container_name: flask_app
     ports:
       - "8081:8081"
     environment:
@@ -16,3 +16,4 @@ services:
 networks:
   app-network:
     driver: bridge
+
