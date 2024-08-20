@@ -9,7 +9,7 @@ COPY . /app
 
 # Install any needed packages specified in requirements.txt
 # Ensure you create a requirements.txt file with Flask listed
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt &&  pip install pytest
 
 # Make port 8081 available to the world outside this container
 EXPOSE 8081
