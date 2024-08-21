@@ -5,7 +5,7 @@
       apt:
         name: docker-ce
         state: present
-        update_cache: yes  # به روزرسانی کش برای نصب
+        update_cache: yes
 
     - name: Ensure Docker service is running
       service:
@@ -20,7 +20,7 @@
         owner: root
         group: root
         mode: '0755'
-    
+
     - name: Copy application files to the target server
       synchronize:
         src: /home/gitlab-runner/builds/iLX2yTsKH/0/root/my-app-flask/
@@ -28,8 +28,8 @@
         mode: push
         recursive: yes
         rsync_opts:
-          - "--exclude=*.pyc"  # مثال برای جلوگیری از انتقال فایل‌های pyc
-          
+          - "--exclude=*.pyc"
+
     - name: Pull Docker image
       docker_image:
         name: my-flask-app
@@ -39,7 +39,7 @@
     - name: Stop and remove old Docker container if exists
       docker_container:
         name: my-flask-app
-        state: absent  # حذف کانتینر قدیمی اگر وجود داشته باشد
+        state: absent
         ignore_errors: yes
 
     - name: Run Docker container

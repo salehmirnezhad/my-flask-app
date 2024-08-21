@@ -3,7 +3,7 @@ stages:
   - test
   - save_image
   - deploy
-  - deploy_to_servers  # مرحله جدید
+  - deploy_to_servers  # مرحله جدید برای استقرار به سرورها
 
 variables:
   CONTAINER_NAME: my-flask-app
@@ -15,7 +15,7 @@ build:
   stage: build
   script:
     - echo "Building the application..."
-    - docker build -t $DOCKER_IMAGE .
+    - docker build -t "$DOCKER_IMAGE" .
   timeout: 60m
   allow_failure: false
 
@@ -23,7 +23,7 @@ test:
   stage: test
   script:
     - echo "Running tests..."
-    - docker run --rm $DOCKER_IMAGE pytest
+    - docker run --rm "$DOCKER_IMAGE" pytest
   timeout: 60m
   allow_failure: false
 
@@ -31,26 +31,26 @@ save_image:
   stage: save_image
   script:
     - echo "Saving Docker image..."
-    - docker save -o my-flask-app_$CI_COMMIT_TAG.tar $DOCKER_IMAGE
+    - docker save -o "my-flask-app_$CI_COMMIT_TAG.tar" "$DOCKER_IMAGE"
   artifacts:
     paths:
-      - my-flask-app_$CI_COMMIT_TAG.tar
+      - "my-flask-app_$CI_COMMIT_TAG.tar"
   allow_failure: false
 
 deploy:
   stage: deploy
   script:
     - echo "Deploying the application locally..."
-    - docker ps -q -f name=$CONTAINER_NAME | xargs -r docker stop || true
-    - docker ps -a -q -f name=$CONTAINER_NAME | xargs -r docker rm || true
-    - docker run -d --name $CONTAINER_NAME -p 8081:8081 $DOCKER_IMAGE
+    - docker ps -q -f name="$CONTAINER_NAME" | xargs -r docker stop || true
+    - docker ps -a -q -f name="$CONTAINER_NAME" | xargs -r docker rm || true
+    - docker run -d --name "$CONTAINER_NAME" -p 8081:8081 "$DOCKER_IMAGE"
   timeout: 60m
   allow_failure: false
 
-deploy_to_servers:  # مرحله جدید
+deploy_to_servers:  # مرحله جدید برای استقرار به سرورها
   stage: deploy_to_servers
   script:
     - echo "Deploying the application to other servers..."
-    - ansible-playbook -i inventory_file my_playbook.yml
+    - ansible-playbook -i inventory_file my_playbook.yml --extra-vars "CI_COMMIT_TAG=$CI_COMMIT_TAG"
   timeout: 60m
   allow_failure: false
