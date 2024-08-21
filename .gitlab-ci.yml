@@ -14,8 +14,7 @@ build:
   stage: build
   script:
     - echo "Building the application..."
-    - docker build -t $IMAGE_NAME:$CI_COMMIT_TAG .
-      #    - docker build -t $DOCKER_IMAGE .
+    - docker build -t $DOCKER_IMAGE .
   timeout: 60m
   allow_failure: false
 
@@ -35,7 +34,7 @@ deploy:
     - docker ps -q -f name=$CONTAINER_NAME | xargs -r docker stop || true
     - docker ps -a -q -f name=$CONTAINER_NAME | xargs -r docker rm || true
     # Remove old images if needed
-    - docker images -q $IMAGE_NAME | xargs -r docker rmi || true
+    #    - docker images -q $IMAGE_NAME | xargs -r docker rmi || true
     # Run the new container
     - docker run -d --name $CONTAINER_NAME -p 8081:8081 $DOCKER_IMAGE
   timeout: 60m
