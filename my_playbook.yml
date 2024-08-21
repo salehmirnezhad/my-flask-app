@@ -5,7 +5,7 @@
       apt:
         name: docker-ce
         state: present
-        update_cache: yes  # به‌روزرسانی کش برای نصب بسته‌ها
+        update_cache: yes  # به روزرسانی کش برای نصب
 
     - name: Ensure Docker service is running
       service:
@@ -13,14 +13,23 @@
         state: started
         enabled: yes
 
+    - name: Create directory for application files
+      file:
+        path: /root/deploy/my-app-flask/
+        state: directory
+        owner: your_user
+        group: your_group
+        mode: '0755'
+    
     - name: Copy application files to the target server
       synchronize:
         src: /home/gitlab-runner/builds/iLX2yTsKH/0/root/my-app-flask/
-        dest: /path/on/target/server/my-app-flask/
+        dest: /root/deploy/my-app-flask/
         mode: push
         recursive: yes
-      # استفاده از rsync برای انتقال فایل‌ها (بیشتر برای فایل‌های بزرگ و دایرکتوری‌ها مفید است)
-
+        rsync_opts:
+          - "--exclude=*.pyc"  # مثال برای جلوگیری از انتقال فایل‌های pyc
+          
     - name: Pull Docker image
       docker_image:
         name: my-flask-app
@@ -30,7 +39,7 @@
     - name: Stop and remove old Docker container if exists
       docker_container:
         name: my-flask-app
-        state: absent  # این عمل کانتینر قدیمی را حذف می‌کند
+        state: absent  # حذف کانتینر قدیمی اگر وجود داشته باشد
         ignore_errors: yes
 
     - name: Run Docker container
