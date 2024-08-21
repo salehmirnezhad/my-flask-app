@@ -1,15 +1,14 @@
 stages:
   - build
   - test
-  - save_image
   - deploy
-  - deploy_to_servers  # مرحله جدید
 
 variables:
   CONTAINER_NAME: my-flask-app
   IMAGE_NAME: my-flask-app
   TAG_NAME: $CI_COMMIT_TAG
   DOCKER_IMAGE: "$IMAGE_NAME:$TAG_NAME"
+
 
 build:
   stage: build
@@ -27,30 +26,16 @@ test:
   timeout: 60m
   allow_failure: false
 
-save_image:
-  stage: save_image
-  script:
-    - echo "Saving Docker image..."
-    - docker save -o my-flask-app_$CI_COMMIT_TAG.tar $DOCKER_IMAGE
-  artifacts:
-    paths:
-      - my-flask-app_$CI_COMMIT_TAG.tar
-  allow_failure: false
-
 deploy:
   stage: deploy
   script:
-    - echo "Deploying the application locally..."
+    - echo "Deploying the application..."
+    # Stop and remove old container if exists
     - docker ps -q -f name=$CONTAINER_NAME | xargs -r docker stop || true
     - docker ps -a -q -f name=$CONTAINER_NAME | xargs -r docker rm || true
+    # Remove old images if needed
+    #    - docker images -q $IMAGE_NAME | xargs -r docker rmi || true
+    # Run the new container
     - docker run -d --name $CONTAINER_NAME -p 8081:8081 $DOCKER_IMAGE
-  timeout: 60m
-  allow_failure: false
-
-deploy_to_servers:  # مرحله جدید
-  stage: deploy_to_servers
-  script:
-    - echo "Deploying the application to other servers..."
-    - ansible-playbook -i inventory_file my_playbook.yml
   timeout: 60m
   allow_failure: false

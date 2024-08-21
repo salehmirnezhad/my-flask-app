@@ -1,0 +1,42 @@
+- hosts: servers
+  become: yes
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: present
+        update_cache: yes  # به‌روزرسانی کش برای نصب بسته‌ها
+
+    - name: Ensure Docker service is running
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Copy application files to the target server
+      synchronize:
+        src: /home/gitlab-runner/builds/iLX2yTsKH/0/root/my-app-flask/
+        dest: /path/on/target/server/my-app-flask/
+        mode: push
+        recursive: yes
+      # استفاده از rsync برای انتقال فایل‌ها (بیشتر برای فایل‌های بزرگ و دایرکتوری‌ها مفید است)
+
+    - name: Pull Docker image
+      docker_image:
+        name: my-flask-app
+        tag: "{{ CI_COMMIT_TAG }}"
+        source: pull
+
+    - name: Stop and remove old Docker container if exists
+      docker_container:
+        name: my-flask-app
+        state: absent  # این عمل کانتینر قدیمی را حذف می‌کند
+        ignore_errors: yes
+
+    - name: Run Docker container
+      docker_container:
+        name: my-flask-app
+        image: my-flask-app:{{ CI_COMMIT_TAG }}
+        state: started
+        ports:
+          - "8081:8081"
