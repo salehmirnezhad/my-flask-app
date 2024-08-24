@@ -34,7 +34,11 @@
       docker_container:
         name: my-flask-app
         state: absent
-        ignore_errors: true
+          #  ignore_errors: true
+      rescue:
+        - name: Handle error if container does not exist
+          debug:
+           msg: "Container 'my-flask-app' does not exist, continuing with the next steps."
 
     - name: Build Docker image
       shell: |
