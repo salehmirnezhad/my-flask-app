@@ -2,3 +2,4 @@
 192.168.200.53 ansible_python_interpreter=/usr/bin/python3.12
 #erver2 ansible_host=192.168.1.101
 
+192.168.200.49 ansible_python_interpreter=/usr/bin/python3.12
