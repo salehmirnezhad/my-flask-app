@@ -30,6 +30,12 @@
         rsync_opts:
           - "--exclude=*.pyc"
 
+    - name: Stop and remove old Docker container if exists
+      docker_container:
+        name: my-flask-app
+        state: absent
+        ignore_errors: yes
+
     - name: Build Docker image
       shell: |
         cd /root/deploy/my-app-flask/
@@ -42,11 +48,6 @@
       #        tag: "{{ CI_COMMIT_TAG }}"
       #        source: pull
 
-    - name: Stop and remove old Docker container if exists
-      docker_container:
-        name: my-flask-app
-        state: absent
-        ignore_errors: yes
 
     - name: Run Docker container
       docker_container:
