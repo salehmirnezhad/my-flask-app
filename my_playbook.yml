@@ -34,7 +34,7 @@
       docker_container:
         name: my-flask-app
         state: absent
-        ignore_errors: yes
+        ignore_errors: true
 
     - name: Build Docker image
       shell: |
