@@ -1,84 +1,192 @@
-My Flask App
 
-In project ye yek app web sade ba estefade az Flask hast ke baraye namayesh tedad va andaze file-ha dar directory-haye moshakhas shode tarahi shode ast. In barname be soorat yek service web ejra mishavad va mitavanad etela'at mored nazar ra az tarigh API eraye dahad.
-Features
+# Project README
 
-    Gozarash andaze va tedad file-ha: Namayesh etela'at daghigh darbare tedad va andaze file-ha dar directory-haye moshakhas shode.
-    Interface web sade: Interface kari sade baraye namayesh natayej dar browser web.
-    Peshte bani az Docker: Barname be rahat'i ba estefade az Docker qabele ejra ast.
+## Overview
 
-Installation
+This project provides a Flask application that displays the number of files and their total size in a specified directory. It uses Docker for containerization and GitLab CI/CD for automated deployment.
 
-Baraye nasb va rah-andazi in project, marahil zire ra donbal konid:
+## Prerequisites
 
-    Clone kardan repository
+Before deploying this project, ensure that the following software is installed on your machine:
 
-    Aval, repository project ra be soorat lokali clone konid:
+1. **Python 3.10 or higher**
+2. **Docker**
+3. **Docker Compose**
+4. **Ansible**
+5. **gitlab-ci**
+6. **gitlab runner**
+### Installing Python 3.10 or Higher
 
-    bash
+To install Python 3.10 or higher on Ubuntu, follow these steps:
 
-git clone http://192.168.200.54:8929/root/my-app-flask.git
+```bash
+# Add the deadsnakes PPA
+sudo add-apt-repository ppa:deadsnakes/ppa
 
-Raftan be folder project
+# Update package list
+sudo apt update
 
-Be folder project boroid:
+# Install Python 3.10
+sudo apt install python3.10
 
-bash
+# Verify installation
+python3.10 --version
+```
 
-cd my-app-flask
+### Installing Docker
 
-Nasb dependencies
+To install Docker on Ubuntu, use the following commands:
 
-Dependencies-haye morde niyaz ra nasb konid:
+```bash
+# Update package list and install prerequisites
+sudo apt update
+sudo apt install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
 
-bash
+# Add Docker’s official GPG key
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
-pip install -r requirements.txt
+# Set up the Docker repository
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
-Ejra kardan barname
+# Update package list and install Docker
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io
 
-Barname ra ba estefade az dastur zire ejra konid:
+# Verify Docker installation
+sudo systemctl status docker
+```
 
-bash
+### Installing Docker Compose
 
-    python dir-size-flask.py
+To install Docker Compose, follow these steps:
 
-    Barname be tore pishfarz dar port 8081 ejra mishavad va mitavanid ba moraje'e be http://localhost:8081 dar browser web khod natayej ra moshahade konid.
+```bash
+# Download Docker Compose
+sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep 'tag_name' | cut -d\" -f4)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 
-Usage
+# Apply executable permissions
+sudo chmod +x /usr/local/bin/docker-compose
 
-Baraye estefade az barname, kafi ast browser khod ra baz konid va be address zire boroid:
+# Verify Docker Compose installation
+docker-compose --version
+```
 
-arduino
+### Installing Ansible
 
-http://localhost:8081
+To install Ansible on Ubuntu, use the following commands:
 
-Ba ersal darkhast-haye HTTP be in address, mitavanid etela'ati darbare tedad va andaze file-ha dar directory-haye moshakhas shode daryaft konid.
-Tests
+```bash
+# Update package list
+sudo apt update
 
-Baraye ejra test-ha, az tool pytest estefade konid. Dastur zire ra baraye ejra test-ha vared konid:
+# Install Ansible
+sudo apt install ansible
 
-bash
+# Verify Ansible installation
+ansible --version
+```
 
-pytest
+### Installing GitLab CI/CD
 
-Test-ha be shoma komak mikonand ta etemad hasil konid ke barname dorost kar mikonad va taghirat jadid sabab mishavad ke moshkelat jadid pida shavad.
-Contributing
+To install GitLab CI/CD using Docker Compose, create a `docker-compose.yml` file with the following content:
 
-Agar temayel darid dar in project moshtarak shavid, lotfan marahil zire ra donbal konid:
+```yaml
+version: '3.6'
+services:
+  gitlab:
+    image: gitlab/gitlab-ee
+    container_name: gitlab
+    restart: always
+    hostname: '192.168.200.54'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://192.168.200.54:8929'
+        gitlab_rails['gitlab_shell_ssh_port'] = 2424
+    ports:
+      - '8929:8929'
+      - '443:443'
+      - '2424:22'
+    volumes:
+      - '$GITLAB_HOME/config:/etc/gitlab'
+      - '$GITLAB_HOME/logs:/var/log/gitlab'
+      - '$GITLAB_HOME/data:/var/opt/gitlab'
+    shm_size: '256m'
+```
 
-    Fork kardan repository: Aval, repository ra fork konid ta yek copy az an dar hesab GitLab khod dashte bashid.
+Run the following commands to start GitLab:
 
-    Sakhtan yek branch jadid: Yek branch jadid baraye features ya taghirat jadid khod sakht konid:
+```bash
+# Start GitLab using Docker Compose
+docker-compose up -d
+```
 
-    bash
+### Installing GitLab Runner
 
-    git checkout -b feature/new-feature
+To install GitLab Runner, use the following commands:
 
-    Applying changes va ersal yek Pull Request: Taghirat khod ra apply konid va ba estefade az Pull Request an-ha ra be repository asli ersal konid.
+```bash
+# Add the GitLab Runner GPG key
+curl -fsSL https://packages.gitlab.com/gitlab/gitlab-runner/gpgkey | gpg --dearmor -o /usr/share/keyrings/gitlab-archive-keyring.gpg
 
-License
+# Add the GitLab Runner repository
+echo "deb [signed-by=/usr/share/keyrings/gitlab-archive-keyring.gpg] https://packages.gitlab.com/runner/gitlab-runner/debian/ stable main" | sudo tee /etc/apt/sources.list.d/runner_gitlab-runner.list
 
-In project tahte license MIT منتشر shode ast. Baraye joz'iyat bishtar darbare license, lotfan be file LICENSE moraje'e konid.
+# Update package list and install GitLab Runner
+sudo apt update
+sudo apt install gitlab-runner
+```
 
-Ba tashakor az inke be project ma nigahe andakhtid! Agar soal ya pishnahadi darid, lotfan ba ma tamas begirid
+### Connecting GitLab Runner to GitLab CI
+
+Register the GitLab Runner with your GitLab instance:
+
+```bash
+# Register the GitLab Runner
+gitlab-runner register
+```
+
+Follow the prompts to provide your GitLab instance URL and registration token.
+
+## Deployment Process
+
+1. **Connect Git Remote**
+
+   Make sure your GitLab repository is configured as a remote:
+
+   ```bash
+   git remote add origin http://192.168.200.54:8929/root/my-app-flask.git
+   ```
+
+   Replace the URL with your GitLab repository URL.
+
+
+2. **Push Changes to GitLab**
+
+   Ensure your GitLab repository is set up and push your changes using:
+
+   ```bash
+   git add .
+   git commit -m "Added new client in playbook"
+   git tag -a v1.0.0 -m "Initial release"
+   git push origin main --tag
+   ```
+
+
+3. **GitLab CI/CD Pipeline**
+
+   The pipeline will automatically build, test, and deploy your application based on the `.gitlab-ci.yml` configuration.
+
+## Application Files
+
+- `dir-size-flask.py`: Flask application for displaying directory info.
+- `Dockerfile`: Dockerfile for building the Flask app image.
+- `my_playbook.yml`: Ansible playbook for deployment.
+- `webhook_listener.py`: Script for triggering GitLab pipelines via webhook.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+Feel free to adjust the instructions and details according to your specific setup and requirements.
