@@ -1,3 +1,4 @@
+---
 - hosts: servers
   become: yes
   tasks:
@@ -29,11 +30,17 @@
     - name: Update resolvconf
       command: resolvconf -u
 
-    - name: Disable systemd-resolved
+    - name: Check if systemd-resolved exists
+      stat:
+        path: /lib/systemd/system/systemd-resolved.service
+      register: systemd_resolved_service
+
+    - name: Disable systemd-resolved if it exists
       systemd:
         name: systemd-resolved
         state: stopped
         enabled: no
+      when: systemd_resolved_service.stat.exists
 
     - name: Install prerequisites
       apt:
@@ -90,26 +97,26 @@
         rsync_opts:
           - "--exclude=*.pyc"
 
-    - block:
-        - name: Stop and remove old Docker container if exists
-          docker_container:
-            name: my-flask-app
-            state: absent
-
-      rescue:
-        - name: Handle error if container does not exist
-          debug:
-            msg: "Container 'my-flask-app' does not exist, continuing with the next steps."
+    - name: Stop and remove old Docker container if exists
+      docker_container:
+        name: my-flask-app
+        state: absent
+      ignore_errors: yes
 
     - name: Build Docker image
-      shell: |
-        cd /root/deploy/my-app-flask/
-        docker build -t my-flask-app:{{ CI_COMMIT_TAG }} .
+      docker_image:
+        name: my-flask-app
+        tag: "{{ CI_COMMIT_TAG }}"
+        source: build
+        build:
+          path: /root/deploy/my-app-flask/
+        force_source: yes
 
     - name: Run Docker container
       docker_container:
         name: my-flask-app
-        image: my-flask-app:{{ CI_COMMIT_TAG }}
+        image: "my-flask-app:{{ CI_COMMIT_TAG }}"
         state: started
         ports:
           - "8081:8081"
+        restart_policy: always
